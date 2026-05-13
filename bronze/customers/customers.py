@@ -15,7 +15,7 @@ schema_path = bronze_checkpoint + "schema"
 # 2. Path for data processing offsets
 offset_path = bronze_checkpoint + "offsets"
 
-# 2. Define Schema
+# 2. Define Schema testing.
 # Using the same structure as your manual read for consistency
 customers_schema = StructType([
     StructField("data", ArrayType(
