@@ -9,7 +9,7 @@ gold_output_path = "abfss://gold@misgauravstorageaccount.dfs.core.windows.net/cu
 orders_df = spark.read.format("delta").load(silver_orders_path)
 customers_df = spark.read.format("delta").load(silver_customers_path)
 
-# 3. Transformation & Aggregation
+# 3. Transformation & Aggregation testing.
 gold_df = (orders_df.join(customers_df, "customer_id", "inner")
     .groupBy("customer_id", "customer_name", "state")
     .agg(
