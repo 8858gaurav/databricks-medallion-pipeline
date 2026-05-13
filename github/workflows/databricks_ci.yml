@@ -1,0 +1,25 @@
+name: Databricks Medallion CI
+
+# Trigger: Run this whenever someone pushes to ANY branch
+on: [push, pull_request]
+
+jobs:
+  python-validation:
+    runs-on: ubuntu-latest # This starts a temporary Linux machine
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install pytest
+          # Add other libs like pyspark if your tests need them
+
+      - name: Run Unit Tests
+        run: |
+          pytest tests/
