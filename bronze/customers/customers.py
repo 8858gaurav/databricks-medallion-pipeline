@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-# Initialize Spark Session
+# Initialize Spark Session test
 spark = SparkSession.builder.appName("Customers_Pipeline").getOrCreate()
 
 # 1. Path Configurations
