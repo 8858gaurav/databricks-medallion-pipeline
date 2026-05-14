@@ -36,8 +36,8 @@ jobs:
         run: |
           echo "Current directory: $(pwd)"
           ls -R
-          echo "Searching for databricks.yml..."
-          find . -name "databricks.yml"
+          echo "Searching for databricks_ci.yml..."
+          find . -name "databricks_ci.yml"
 
       - name: Bundle Deploy
         # If your file is in the root, leave as is. 
