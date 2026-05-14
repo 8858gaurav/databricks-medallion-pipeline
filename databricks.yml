@@ -58,11 +58,16 @@ resources:
             spark_version: 15.4.x-scala2.12
             spark_conf:
               spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
+              spark.databricks.cluster.profile: singleNode # Required for single node
             node_type_id: Standard_D4s_v3
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
             data_security_mode: DATA_SECURITY_MODE_DEDICATED
             runtime_engine: STANDARD
+            # --- FIXES BELOW ---
+            kind: SINGLE_NODE 
+            custom_tags:
+              ResourceClass: SingleNode
             is_single_node: true
             num_workers: 0
       git_source:
