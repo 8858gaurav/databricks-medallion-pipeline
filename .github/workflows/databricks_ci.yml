@@ -33,10 +33,15 @@ jobs:
 
       # This step helps us debug by showing exactly where the files are
       - name: List files for debugging
-        run: ls -R
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -R
+          echo "Searching for databricks.yml..."
+          find . -name "databricks.yml"
 
       - name: Bundle Deploy
-        # We use './' to tell it to look in the current root directory
+        # If your file is in the root, leave as is. 
+        # If it is in a subfolder, change to: databricks bundle deploy -t prod --path ./FOLDER_NAME
         run: databricks bundle deploy -t prod
         env:
           DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
