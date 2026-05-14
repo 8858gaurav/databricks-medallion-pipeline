@@ -40,10 +40,12 @@ jobs:
           echo "Searching for the bundle config..."
           find . -name "databricks.yml"
 
-      - name: Bundle Deploy
-        # If your file is in the root, leave as is. 
-        # If it is in a subfolder, change to: databricks bundle deploy -t prod --path ./FOLDER_NAME
-        run: databricks bundle run JOB_via_GitHUb -t prod
+      - name: Bundle Deploy and Run
+        # We must deploy first so Databricks has the latest code, 
+        # then we run the job to see it in action.
+        run: |
+          databricks bundle deploy -t prod
+          databricks bundle run JOB_via_GitHUb -t prod
         env:
           DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
