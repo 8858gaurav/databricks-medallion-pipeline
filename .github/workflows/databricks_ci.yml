@@ -32,12 +32,13 @@ jobs:
         uses: databricks/setup-cli@main
 
       # This step helps us debug by showing exactly where the files are
+    # Updated Debug Step
       - name: List files for debugging
         run: |
           echo "Current directory: $(pwd)"
-          ls -R
-          echo "Searching for databricks_ci.yml..."
-          find . -name "databricks_ci.yml"
+          ls -F
+          echo "Searching for the bundle config..."
+          find . -name "databricks.yml"
 
       - name: Bundle Deploy
         # If your file is in the root, leave as is. 
