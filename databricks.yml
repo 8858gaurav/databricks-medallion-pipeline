@@ -15,10 +15,10 @@ resources:
           - gauravmishra010@gmail.com
         on_failure:
           - gauravmishra010@gmail.com
-      trigger:
-        pause_status: UNPAUSED
-        file_arrival:
-          url: abfss://input-path@misgauravstorageaccount.dfs.core.windows.net/
+      # trigger:
+      #  pause_status: UNPAUSED
+      #  file_arrival:
+      #    url: abfss://input-path@misgauravstorageaccount.dfs.core.windows.net/
       tasks:
         - task_key: Process_Customers
           spark_python_task:
