@@ -1,3 +1,11 @@
+bundle:
+  name: databricks-medallion-pipeline
+
+targets:
+  prod:
+    workspace:
+      host: https://adb-7405605583082922.2.azuredatabricks.net
+
 resources:
   jobs:
     JOB_via_GitHUb:
@@ -29,6 +37,13 @@ resources:
             python_file: silver/customers/silver_processing_customers.py
             source: GIT
           job_cluster_key: Gaurav_Cluster
+        - task_key: process_bronze_orders
+          depends_on:
+            - task_key: Process_Orders
+          spark_python_task:
+            python_file: silver/orders/silver_processing_orders.py
+            source: GIT
+          job_cluster_key: Gaurav_Cluster
         - task_key: process_bronze_gold
           depends_on:
             - task_key: process_bronze_customers
@@ -37,17 +52,10 @@ resources:
             python_file: gold/gold_code.py
             source: GIT
           job_cluster_key: Gaurav_Cluster
-        - task_key: process_bronze_orders
-          depends_on:
-            - task_key: Process_Orders
-          spark_python_task:
-            python_file: silver/orders/silver_processing_orders.py
-            source: GIT
-          job_cluster_key: Gaurav_Cluster
       job_clusters:
         - job_cluster_key: Gaurav_Cluster
           new_cluster:
-            spark_version: 18.2.x-scala2.13
+            spark_version: 15.4.x-scala2.12
             spark_conf:
               spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
             node_type_id: Standard_D4s_v3
@@ -55,7 +63,6 @@ resources:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
             data_security_mode: DATA_SECURITY_MODE_DEDICATED
             runtime_engine: STANDARD
-            kind: CLASSIC_PREVIEW
             is_single_node: true
             num_workers: 0
       git_source:
