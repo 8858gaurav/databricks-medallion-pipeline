@@ -57,14 +57,15 @@ resources:
           new_cluster:
             spark_version: 15.4.x-scala2.12
             spark_conf:
+              # We keep the storage key but remove the cluster.profile tag
               spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
-              spark.databricks.cluster.profile: singleNode
             node_type_id: Standard_D4s_v3
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
+            # This 'DEDICATED' mode is what was clashing with the manual tags
             data_security_mode: DATA_SECURITY_MODE_DEDICATED
             runtime_engine: STANDARD
-            kind: CLASSIC_PREVIEW
+            # We remove 'kind' and 'is_single_node' entirely to stop the API errors
             num_workers: 0
       git_source:
         git_url: https://github.com/8858gaurav/databricks-medallion-pipeline.git
