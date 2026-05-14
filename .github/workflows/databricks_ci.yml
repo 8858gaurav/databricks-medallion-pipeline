@@ -2,12 +2,11 @@ name: Databricks Medallion CI/CD
 
 on:
   push:
-    branches: [main] # CD only happens on main
+    branches: [main]
   pull_request:
     branches: [main]
 
 jobs:
-  # --- CI TASK: VALIDATION ---
   python-validation:
     runs-on: ubuntu-latest
     steps:
@@ -17,27 +16,28 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install dependencies
-        run: |
-          pip install pytest
+        run: pip install pytest
       - name: Run Unit Tests
         run: pytest tests/
 
-  # --- CD TASK: DEPLOYMENT ---
   deploy-to-databricks:
     runs-on: ubuntu-latest
-    needs: python-validation # ONLY deploy if tests pass
+    needs: python-validation
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
       - uses: actions/checkout@v3
-      
-      # 1. Install the Databricks CLI on the GitHub Runner
+
       - name: Install Databricks CLI
         uses: databricks/setup-cli@main
 
-      # 2. Deploy the Bundle
+      # This step helps us debug by showing exactly where the files are
+      - name: List files for debugging
+        run: ls -R
+
       - name: Bundle Deploy
-        run: databricks bundle deploy -t prod # Use your prod target from databricks.yml
+        # We use './' to tell it to look in the current root directory
+        run: databricks bundle deploy -t prod
         env:
           DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
