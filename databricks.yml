@@ -22,26 +22,26 @@ resources:
       tasks:
         - task_key: Process_Customers
           spark_python_task:
-            python_file: bronze/customers/customers.py
+            python_file: ./bronze/customers/customers.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
         - task_key: Process_Orders
           spark_python_task:
-            python_file: bronze/orders/orders.py
+            python_file: ./bronze/orders/orders.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
         - task_key: process_bronze_customers
           depends_on:
             - task_key: Process_Customers
           spark_python_task:
-            python_file: silver/customers/silver_processing_customers.py
+            python_file: ./silver/customers/silver_processing_customers.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
         - task_key: process_bronze_orders
           depends_on:
             - task_key: Process_Orders
           spark_python_task:
-            python_file: silver/orders/silver_processing_orders.py
+            python_file: ./silver/orders/silver_processing_orders.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
         - task_key: process_bronze_gold
@@ -49,7 +49,7 @@ resources:
             - task_key: process_bronze_customers
             - task_key: process_bronze_orders
           spark_python_task:
-            python_file: gold/gold_code.py
+            python_file: ./gold/gold_code.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
       job_clusters:
