@@ -4,4 +4,4 @@ bundle:
 targets:
   prod:
     workspace:
-      host: https://adb-7405605583082922.net
+      host: https://adb-7405605583082922.2.azuredatabricks.net
