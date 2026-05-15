@@ -16,8 +16,8 @@ jobs:
 
       - name: Bundle Deploy and Run
         run: |
-          databricks bundle deploy -t prod
-          databricks bundle run JOB_via_GitHUb -t prod
+          databricks bundle deploy -t default
+          databricks bundle run JOB_via_GitHUb -t default
         env:
           DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
