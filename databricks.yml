@@ -1,40 +1,37 @@
+bundle:
+  name: databricks-medallion-pipeline
+
 resources:
   jobs:
     JOB_via_GitHUb:
       name: JOB via - GitHUb
-
-      git_source:
-        git_url: https://github.com/8858gaurav/databricks-medallion-pipeline.git
-        git_provider: gitHub
-        git_branch: main
-
       tasks:
         - task_key: Process_Customers
           spark_python_task:
-            python_file: bronze/customers/customers.py
-            source: GIT
+            python_file: src/bronze/customers/customers.py
+            source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
         - task_key: Process_Orders
           spark_python_task:
-            python_file: bronze/orders/orders.py
-            source: GIT
+            python_file: src/bronze/orders/orders.py
+            source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
         - task_key: process_bronze_customers
           depends_on:
             - task_key: Process_Customers
           spark_python_task:
-            python_file: silver/customers/silver_processing_customers.py
-            source: GIT
+            python_file: src/silver/customers/silver_processing_customers.py
+            source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
         - task_key: process_bronze_orders
           depends_on:
             - task_key: Process_Orders
           spark_python_task:
-            python_file: silver/orders/silver_processing_orders.py
-            source: GIT
+            python_file: src/silver/orders/silver_processing_orders.py
+            source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
         - task_key: process_bronze_gold
@@ -42,8 +39,8 @@ resources:
             - task_key: process_bronze_customers
             - task_key: process_bronze_orders
           spark_python_task:
-            python_file: gold/gold_code.py
-            source: GIT
+            python_file: src/gold/gold_code.py
+            source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
       job_clusters:
@@ -52,12 +49,14 @@ resources:
             spark_version: 15.4.x-scala2.12
             node_type_id: Standard_D4s_v3
             num_workers: 0
-
             spark_conf:
               spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
-
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
-
             data_security_mode: NONE
             runtime_engine: STANDARD
+
+targets:
+  default:
+    workspace:
+      host: https://adb-xxx.azuredatabricks.net # (Optional: Or rely on the environment variable in GitHub)

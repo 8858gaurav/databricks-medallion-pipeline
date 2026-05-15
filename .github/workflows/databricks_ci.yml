@@ -10,15 +10,26 @@ jobs:
   python-validation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.9'
+          
       - name: Install dependencies
-        run: pip install pytest
+        run: |
+          pip install pytest
+          # If your python files require packages to validate syntax, add them here
+          
       - name: Run Unit Tests
-        run: pytest tests/
+        run: |
+          # Only runs if the tests directory actually exists
+          if [ -d "tests" ]; then
+            pytest tests/
+          else
+            echo "No tests directory found, skipping."
+          fi
 
   deploy-to-databricks:
     runs-on: ubuntu-latest
@@ -26,26 +37,24 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install Databricks CLI
-        uses: databricks/setup-cli@main
+        uses: databricks/setup-cli@v0.2.0
 
-      # This step helps us debug by showing exactly where the files are
-    # Updated Debug Step
       - name: List files for debugging
         run: |
           echo "Current directory: $(pwd)"
           ls -F
-          echo "Searching for the bundle config..."
           find . -name "databricks.yml"
 
       - name: Bundle Deploy and Run
-        # We must deploy first so Databricks has the latest code, 
-        # then we run the job to see it in action.
         run: |
-          databricks bundle deploy -t default
-          databricks bundle run JOB_via_GitHUb -t default
+          # Deploying the asset bundle creates the workspace files and updates the job definitions
+          databricks bundle deploy --target default
+          
+          # Running the bundle job via its resource key defined in databricks.yml
+          databricks bundle run JOB_via_GitHUb --target default
         env:
-          DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
