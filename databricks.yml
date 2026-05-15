@@ -5,6 +5,12 @@ resources:
   jobs:
     JOB_via_GitHUb:
       name: JOB via - GitHUb
+      # Add this Schedule configuration block
+      schedule:
+        quartz_cron_expression: "0 0 6 * * ?" # Runs every day at 6:00 AM UTC
+        timezone_id: "UTC"                     # Set your preferred timezone (e.g., "Asia/Kolkata")
+        pause_status: "UNPAUSED"               # "UNPAUSED" activates the schedule immediately upon deployment
+        # Seconds Minutes Hours Day-of-Month Month Day-of-Week
       tasks:
         - task_key: Process_Customers
           spark_python_task:
