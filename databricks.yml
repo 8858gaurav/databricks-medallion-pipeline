@@ -8,13 +8,13 @@ resources:
       tasks:
         - task_key: Process_Customers
           spark_python_task:
-            python_file: src/bronze/customers/customers.py
+            python_file: bronze/customers/customers.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
         - task_key: Process_Orders
           spark_python_task:
-            python_file: src/bronze/orders/orders.py
+            python_file: bronze/orders/orders.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
@@ -22,7 +22,7 @@ resources:
           depends_on:
             - task_key: Process_Customers
           spark_python_task:
-            python_file: src/silver/customers/silver_processing_customers.py
+            python_file: silver/customers/silver_processing_customers.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
@@ -30,7 +30,7 @@ resources:
           depends_on:
             - task_key: Process_Orders
           spark_python_task:
-            python_file: src/silver/orders/silver_processing_orders.py
+            python_file: silver/orders/silver_processing_orders.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
@@ -39,7 +39,7 @@ resources:
             - task_key: process_bronze_customers
             - task_key: process_bronze_orders
           spark_python_task:
-            python_file: src/gold/gold_code.py
+            python_file: gold/gold_code.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
 
@@ -49,8 +49,17 @@ resources:
             spark_version: 15.4.x-scala2.12
             node_type_id: Standard_D4s_v3
             num_workers: 0
+            
+            # Required Spark Configs for Single Node Clusters
             spark_conf:
+              spark.databricks.cluster.profile: "singleNode"
+              spark.master: "local[*]"
               spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
+            
+            # Required Tags for Single Node Clusters
+            custom_tags:
+              ResourceClass: "SingleNode"
+
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
             data_security_mode: NONE
@@ -59,4 +68,4 @@ resources:
 targets:
   default:
     workspace:
-      host: https://adb-7405605583082922.2.azuredatabricks.net # (Optional: Or rely on the environment variable in GitHub)
+      host: https://adb-7405605583082922.2.azuredatabricks.net  # (Ensure your host URL is kept here)
