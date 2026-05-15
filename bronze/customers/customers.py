@@ -52,3 +52,5 @@ query = (processed_df.writeStream
     .outputMode("append")
     .start(output_base))
 query.processAllAvailable()
+query.stop()
+spark.streams.awaitAnyTermination(20)

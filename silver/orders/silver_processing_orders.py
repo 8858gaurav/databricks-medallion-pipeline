@@ -32,3 +32,5 @@ query = (silver_df.writeStream
     .start(output_base))
 
 query.processAllAvailable()
+query.stop()
+spark.streams.awaitAnyTermination(20)
