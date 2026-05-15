@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-
+print("STEP 1 - Script started")
 spark = SparkSession.builder.appName("Orders_Pipeline").getOrCreate()
 
 # 1. Path Configurations
@@ -40,6 +40,7 @@ processed_df = (raw_df
     .withColumn("processing_timestamp", current_timestamp())
     .repartition(1)) # it'll create only 1 file inside the output folder
 
+print("STEP 2 - About to start stream")
 # 5. Write to Output
 query = (processed_df.writeStream
     .trigger(availableNow=True)
@@ -47,7 +48,8 @@ query = (processed_df.writeStream
     .option("checkpointLocation", offset_path)
     .outputMode("append")
     .start(output_base))
-
+print("STEP 3 - Stream started")
+print("STEP 4 - Before processAllAvailable")
 query.processAllAvailable()
 query.stop()
 print("=== STREAM FINISHED ===")

@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-
+print("STEP 1 - Script started")
 # Initialize Spark Session test
 spark = SparkSession.builder.appName("Customers_Pipeline").getOrCreate()
 
@@ -44,6 +44,7 @@ processed_df = (raw_df
     .withColumn("ingestion_timestamp", current_timestamp())
     .repartition(1)) # it'll create only 1 file inside the output folder
 
+print("STEP 2 - About to start stream")
 # 5. Write to Output (Trigger Once / Batch Mode)
 query = (processed_df.writeStream
     .trigger(availableNow=True)
@@ -51,6 +52,8 @@ query = (processed_df.writeStream
     .option("checkpointLocation", offset_path)
     .outputMode("append")
     .start(output_base))
+print("STEP 3 - Stream started")
+print("STEP 4 - Before processAllAvailable")
 query.processAllAvailable()
 query.stop()
 print("=== STREAM FINISHED ===")
