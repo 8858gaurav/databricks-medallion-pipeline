@@ -59,7 +59,7 @@ resources:
             node_type_id: Standard_D4s_v3
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
-            data_security_mode: DATA_SECURITY_MODE_DEDICATED
+            data_security_mode: NONE
             single_user_name: gauravmishra010@gmail.com
             runtime_engine: STANDARD
             num_workers: 0
