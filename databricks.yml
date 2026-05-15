@@ -58,7 +58,7 @@ resources:
             spark_version: 15.4.x-scala2.12
             spark_conf:
               # We keep the storage key but remove the cluster.profile tag
-              spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope.misgaurav-secret-scope}}"
+              spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
             node_type_id: Standard_D4s_v3
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
