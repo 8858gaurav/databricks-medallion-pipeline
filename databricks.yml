@@ -16,7 +16,7 @@ resources:
         on_failure:
           - gauravmishra010@gmail.com
       # trigger:
-      #  pause_status: UNPAUSED
+      #  pause_status: UNPAUSED, I manually did it this parts. 
       #  file_arrival:
       #    url: abfss://input-path@misgauravstorageaccount.dfs.core.windows.net/
       tasks:
