@@ -11,6 +11,18 @@ resources:
         timezone_id: "UTC"                     # Set your preferred timezone (e.g., "Asia/Kolkata")
         pause_status: "UNPAUSED"               # "UNPAUSED" activates the schedule immediately upon deployment
         # Seconds Minutes Hours Day-of-Month Month Day-of-Week
+      email_notifications:
+        on_failure:
+          - gauravmishra010@gmail.com
+        on_success: 
+          - gauravmishra010@gmail.com
+        on_duration_warning_threshold_exceeded:
+          - gauravmishra010@gmail.com 
+      health:
+        rules:
+          - metric: "RUN_DURATION_SECONDS"
+            op: "GREATER_THAN"
+            value: 3600  # 3600 seconds = 1 hour (Adjust this based on your pipeline's normal runtime)
       tasks:
         - task_key: Process_Customers
           spark_python_task:
