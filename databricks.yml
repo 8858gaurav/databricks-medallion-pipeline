@@ -67,7 +67,7 @@ resources:
             single_user_name: gauravmishra010@gmail.com
             runtime_engine: STANDARD
             # We remove 'kind' and 'is_single_node' entirely to stop the API errors
-            num_workers: 0
+            num_workers: 1
       git_source:
         git_url: https://github.com/8858gaurav/databricks-medallion-pipeline.git
         git_provider: gitHub
