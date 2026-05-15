@@ -16,7 +16,7 @@ resources:
         on_failure:
           - gauravmishra010@gmail.com
       # trigger:
-      #  pause_status: UNPAUSED, I manually did it this parts. 
+      #  pause_status: UNPAUSED, I manually did it this parts.  yo
       #  file_arrival:
       #    url: abfss://input-path@misgauravstorageaccount.dfs.core.windows.net/
       tasks:
@@ -58,12 +58,13 @@ resources:
             spark_version: 15.4.x-scala2.12
             spark_conf:
               # We keep the storage key but remove the cluster.profile tag
-              spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
+              spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope.misgaurav-secret-scope}}"
             node_type_id: Standard_D4s_v3
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
             # This 'DEDICATED' mode is what was clashing with the manual tags
             data_security_mode: DATA_SECURITY_MODE_DEDICATED
+            single_user_name: gauravmishra010@gmail.com
             runtime_engine: STANDARD
             # We remove 'kind' and 'is_single_node' entirely to stop the API errors
             num_workers: 0
