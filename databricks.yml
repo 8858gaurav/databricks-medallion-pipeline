@@ -5,6 +5,9 @@ resources:
   jobs:
     JOB_via_GitHUb:
       name: JOB via - GitHUb
+      # Hard stop the entire job if it runs for more than 2 hours (7200 seconds)
+      max_concurrent_runs: 1
+      timeout_seconds: 7200
       # Add this Schedule configuration block
       schedule:
         quartz_cron_expression: "0 0 6 * * ?" # Runs every day at 6:00 AM UTC
@@ -29,12 +32,18 @@ resources:
             python_file: bronze/customers/customers.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
+          max_retries: 2
+          min_retry_interval_millis: 300000 
+          retry_on_timeout: true
 
         - task_key: Process_Orders
           spark_python_task:
             python_file: bronze/orders/orders.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
+          max_retries: 2
+          min_retry_interval_millis: 300000 
+          retry_on_timeout: true
 
         - task_key: process_bronze_customers
           depends_on:
@@ -43,6 +52,9 @@ resources:
             python_file: silver/customers/silver_processing_customers.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
+          max_retries: 2
+          min_retry_interval_millis: 300000 
+          retry_on_timeout: true
 
         - task_key: process_bronze_orders
           depends_on:
@@ -51,6 +63,9 @@ resources:
             python_file: silver/orders/silver_processing_orders.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
+          max_retries: 2
+          min_retry_interval_millis: 300000 
+          retry_on_timeout: true
 
         - task_key: process_bronze_gold
           depends_on:
@@ -60,6 +75,9 @@ resources:
             python_file: gold/gold_code.py
             source: WORKSPACE
           job_cluster_key: Gaurav_Cluster
+          max_retries: 2
+          min_retry_interval_millis: 300000 
+          retry_on_timeout: true
 
       job_clusters:
         - job_cluster_key: Gaurav_Cluster
