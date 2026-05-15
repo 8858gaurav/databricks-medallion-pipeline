@@ -59,4 +59,4 @@ resources:
 targets:
   default:
     workspace:
-      host: https://adb-xxx.azuredatabricks.net # (Optional: Or rely on the environment variable in GitHub)
+      host: https://adb-7405605583082922.2.azuredatabricks.net # (Optional: Or rely on the environment variable in GitHub)
