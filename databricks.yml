@@ -13,22 +13,31 @@ resources:
   jobs:
     JOB_via_GitHUb:
       name: JOB via - GitHUb
+
+      git_source:
+        git_url: https://github.com/8858gaurav/databricks-medallion-pipeline.git
+        git_provider: gitHub
+        git_branch: main
+
       email_notifications:
         on_success:
           - gauravmishra010@gmail.com
         on_failure:
           - gauravmishra010@gmail.com
+
       tasks:
         - task_key: Process_Customers
           spark_python_task:
             python_file: bronze/customers/customers.py
             source: GIT
           job_cluster_key: Gaurav_Cluster
+
         - task_key: Process_Orders
           spark_python_task:
             python_file: bronze/orders/orders.py
             source: GIT
           job_cluster_key: Gaurav_Cluster
+
         - task_key: process_bronze_customers
           depends_on:
             - task_key: Process_Customers
@@ -36,6 +45,7 @@ resources:
             python_file: silver/customers/silver_processing_customers.py
             source: GIT
           job_cluster_key: Gaurav_Cluster
+
         - task_key: process_bronze_orders
           depends_on:
             - task_key: Process_Orders
@@ -43,6 +53,7 @@ resources:
             python_file: silver/orders/silver_processing_orders.py
             source: GIT
           job_cluster_key: Gaurav_Cluster
+
         - task_key: process_bronze_gold
           depends_on:
             - task_key: process_bronze_customers
@@ -51,27 +62,22 @@ resources:
             python_file: gold/gold_code.py
             source: GIT
           job_cluster_key: Gaurav_Cluster
+
       job_clusters:
         - job_cluster_key: Gaurav_Cluster
           new_cluster:
             spark_version: 15.4.x-scala2.12
-            spark_conf:
-              # 1. MANDATORY FOR SINGLE NODE: Tells Spark to process data locally instead of waiting for workers
-              spark.databricks.cluster.profile: "singleNode"
-              spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
             node_type_id: Standard_D4s_v3
+            num_workers: 1
+
+            spark_conf:
+              spark.hadoop.fs.azure.account.key.misgauravstorageaccount.dfs.core.windows.net: "{{secrets/databricks-demo-scope/misgaurav-secret-scope}}"
+
             spark_env_vars:
               PYSPARK_PYTHON: /databricks/python3/bin/python3
+
             data_security_mode: NONE
-            single_user_name: gauravmishra010@gmail.com
             runtime_engine: STANDARD
-            num_workers: 0
-            # 2. MANDATORY FOR SINGLE NODE: Tells the cloud coordinator to allocate a single host instance
-            custom_tags:
-              ResourceClass: SingleNode
-      git_source:
-        git_url: https://github.com/8858gaurav/databricks-medallion-pipeline.git
-        git_provider: gitHub
-        git_branch: main
+
       queue:
         enabled: true
