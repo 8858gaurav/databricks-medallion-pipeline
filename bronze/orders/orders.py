@@ -50,5 +50,4 @@ query = (processed_df.writeStream
 
 query.processAllAvailable()
 query.stop()
-spark.streams.awaitAnyTermination(20)
 print("=== STREAM FINISHED ===")
