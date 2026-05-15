@@ -31,4 +31,4 @@ query = (silver_df.writeStream
     .outputMode("append")
     .start(output_base))
 
-query.awaitTermination()
+query.processAllAvailable()

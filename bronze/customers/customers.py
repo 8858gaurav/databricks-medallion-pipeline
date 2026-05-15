@@ -51,4 +51,4 @@ query = (processed_df.writeStream
     .option("checkpointLocation", offset_path)
     .outputMode("append")
     .start(output_base))
-query.awaitTermination()
+query.processAllAvailable()
