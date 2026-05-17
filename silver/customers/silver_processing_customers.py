@@ -2,10 +2,12 @@ from pyspark.sql.functions import col, upper, trim, current_timestamp
 
 # 1. Path Configurations
 input_base = "abfss://bronze@misgauravstorageaccount.dfs.core.windows.net/customers/"
-output_base = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/customers/"
+output_base = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/processed_customers/"
 silver_checkpoint = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/_checkpoints/customers/"
 # 1. Path for data processing offsets
 offset_path = silver_checkpoint + "offsets"
+
+spark.sql("""CREATE SCHEMA IF NOT EXISTS misgauravcatalog.retaildb""")
 
 # 1. Read from the Bronze folder in ADLS
 bronze_df = (spark.readStream
@@ -22,14 +24,29 @@ silver_df = (bronze_df
     .dropDuplicates(["customer_id"]) # Deduplicate based on primary key
 )
 
-# 3. Write to Silver folder in ADLS
-query = (silver_df.writeStream 
-    .trigger(availableNow=True)
-    .format("delta")
-    .option("checkpointLocation", offset_path)
-    .outputMode("append")
-    .start(output_base))
+# 3. Write to Silver folder in ADLS & created delta table
+query = (silver_df.writeStream
+    .format("delta") 
+    .option("checkpointLocation", offset_path) 
+    .outputMode('append') 
+    .option("path", output_base) 
+    .trigger(availableNow=True) 
+    .toTable('misgauravcatalog.retaildb.silver_customer_data')
+)
 
-query.processAllAvailable()
-query.stop()
-print("=== STREAM FINISHED ===")
+print("Streaming query started. Processing available batch data...")
+
+query.awaitTermination()
+
+print("Streaming batch complete. Data safely committed to Silver layer.")
+print("Running file compaction and Z-Ordering maintenance...")
+
+# small file problems in db: Optimize, delta.autoOptimize.optimizeWrite, delta.autoOptimize.autoCompact
+# compaction/bin packing take multiple small files & merge them into 1 large files.
+# in databricks, Optimize commands used to compact delta files upto 1 GB ; if we want > 128 MB of file use this.
+# delta.autoOptimize.optimizeWrite = true ; before writing to the disk many small files are combine them to form a larger files (128MB), created bigger files (128MB). create a files around 128 MB after clubbing ; 
+# delta.autoOptimize.autoCompact = true ; small files are already written to the disk, then compacted to form larger files (128MB), works only when we have > 50 smaill files. create a files around 128 MB after clubbing ; 
+# 4. Maintenance: Now it is 100% safe to optimize because the data is fully written
+spark.sql("OPTIMIZE misgauravcatalog.retaildb.silver_customer_data ZORDER BY customer_id")
+
+print("Optimization and Z-Ordering Complete.")
