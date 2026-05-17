@@ -2,11 +2,7 @@ from pyspark.sql.functions import col, upper, trim, current_timestamp
 from pyspark.sql import SparkSession
 
 spark = SparkSession.builder \
-    .appName("Hive-Warehouse-Delta") \
-    .enableHiveSupport() \
-    .config("spark.sql.warehouse.dir", "abfss://warehouse@misgauravstorageaccount.dfs.core.windows.net/") \
-    .config("spark.sql.catalog.misgauravcatalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog") \
-    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+    .appName("cleaned_customers") \
     .getOrCreate()
 
 # 1. Path Configurations
