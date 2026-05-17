@@ -7,6 +7,7 @@ silver_checkpoint = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net
 # 1. Path for data processing offsets
 offset_path = silver_checkpoint + "offsets"
 
+spark.sql("USE CATALOG misgauravcatalog")
 spark.sql("""CREATE SCHEMA IF NOT EXISTS retaildb""")
 
 # 1. Read from the Bronze folder in ADLS
