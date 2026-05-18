@@ -2,7 +2,7 @@ from pyspark.sql.functions import col, upper, trim, current_timestamp
 
 # 1. Path Configurations
 input_base = "abfss://bronze@misgauravstorageaccount.dfs.core.windows.net/customers/"
-output_base = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/processed_customers/"
+output_base = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/customers/"
 silver_checkpoint = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/_checkpoints/customers/"
 # 1. Path for data processing offsets
 offset_path = silver_checkpoint + "offsets"
@@ -30,6 +30,7 @@ silver_df = (bronze_df
 # 3. Write to Silver folder in ADLS & created delta table
 query = (silver_df.writeStream
     .format("delta") 
+    .option("mergeSchema", "true")
     .option("checkpointLocation", offset_path) 
     .outputMode('append') 
     .option("path", output_base) 

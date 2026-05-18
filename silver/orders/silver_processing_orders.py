@@ -31,6 +31,7 @@ silver_df = (bronze_df
 # 3. Write to Silver folder in ADLS & created delta table
 query = (silver_df.writeStream
     .format("delta") 
+    .option("mergeSchema", "true")
     .option("checkpointLocation", offset_path) 
     .outputMode('append') 
     .option("path", output_base) 

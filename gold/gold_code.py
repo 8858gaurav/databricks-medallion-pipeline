@@ -12,6 +12,10 @@ spark.sql("use catalog misgauravcatalog")
 spark.sql("create schema if not exists golddb")
 
 # 2. READ as Streaming DataFrames and correctly apply watermarks
+orders_df_new = spark.readStream.table("misgauravcatalog.silverdb.silver_order_data")
+customers_df_new = spark.readStream.table("misgauravcatalog.silverdb.silver_customer_data")
+orders_df_new.printSchema()
+customers_df_new.printSchema()
 orders_df = spark.readStream.table("misgauravcatalog.silverdb.silver_order_data").withWatermark("_silver_order_processed_at", "30 minutes")
 customers_df = spark.readStream.table("misgauravcatalog.silverdb.silver_customer_data").withWatermark("_silver_customer_processed_at", "30 minutes")
 
