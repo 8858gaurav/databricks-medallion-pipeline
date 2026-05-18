@@ -9,7 +9,7 @@ offset_path = silver_checkpoint + "offsets"
 
 print("catalog name")
 spark.sql("show catalogs").show()
-spark.sql("use catalog spark_catalog")
+spark.sql("use catalog misgauravcatalog")
 spark.sql("create schema if not exists silverdb")
 
 # 1. Read from the Bronze folder in ADLS
@@ -35,7 +35,7 @@ query = (silver_df.writeStream
     .outputMode('append') 
     .option("path", output_base) 
     .trigger(availableNow=True) 
-    .toTable('spark_catalog.silverdb.silver_order_data')
+    .toTable('misgauravcatalog.silverdb.silver_order_data')
 )
 
 print("Streaming query started. Processing available batch data...")
@@ -51,6 +51,6 @@ print("Running file compaction and Z-Ordering maintenance...")
 # delta.autoOptimize.optimizeWrite = true ; before writing to the disk many small files are combine them to form a larger files (128MB), created bigger files (128MB). create a files around 128 MB after clubbing ; 
 # delta.autoOptimize.autoCompact = true ; small files are already written to the disk, then compacted to form larger files (128MB), works only when we have > 50 smaill files. create a files around 128 MB after clubbing ; 
 # 4. Maintenance: Now it is 100% safe to optimize because the data is fully written
-spark.sql("OPTIMIZE spark_catalog.silverdb.silver_order_data ZORDER BY order_id")
+spark.sql("OPTIMIZE misgauravcatalog.silverdb.silver_order_data ZORDER BY order_id")
 
 print("Optimization and Z-Ordering Complete.")
