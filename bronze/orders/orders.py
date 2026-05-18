@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-print("STEP 1 - Script started")
+
 spark = SparkSession.builder.appName("Orders_Pipeline").getOrCreate()
 
 # 1. Path Configurations
@@ -25,11 +25,11 @@ orders_schema = StructType([
 ])
 
 # 3. Read using Auto Loader with EXPLICIT SCHEMA
-raw_df = (spark.readStream
+raw_df = (spark.read
     .format("cloudFiles")
     .option("cloudFiles.format", "json")
     .option("cloudFiles.schemaLocation", schema_path)
-    .schema(orders_schema)  # <--- ADD THIS LINE HERE
+    .schema(orders_schema)
     .load(input_base))
 
 # 4. Processing Logic
@@ -42,14 +42,8 @@ processed_df = (raw_df
 
 print("STEP 2 - About to start stream")
 # 5. Write to Output
-query = (processed_df.writeStream
-    .trigger(availableNow=True)
+query = (processed_df.write
     .format("delta")
     .option("checkpointLocation", offset_path)
     .outputMode("append")
-    .start(output_base))
-print("STEP 3 - Stream started")
-print("STEP 4 - Before processAllAvailable")
-query.processAllAvailable()
-query.stop()
-print("=== STREAM FINISHED ===")
+    .save(output_base))

@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-print("STEP 1 - Script started")
+
 # Initialize Spark Session test
 spark = SparkSession.builder.appName("Customers_Pipeline").getOrCreate()
 
@@ -15,7 +15,7 @@ schema_path = bronze_checkpoint + "schema"
 # 2. Path for data processing offsets
 offset_path = bronze_checkpoint + "offsets"
 
-# 2. Define Schema testing2.
+# 2. Define Schema.
 # Using the same structure as your manual read for consistency
 customers_schema = StructType([
     StructField("data", ArrayType(
@@ -29,7 +29,7 @@ customers_schema = StructType([
 
 # 3. Read using Auto Loader (Incremental Batch Mode)
 # This replaces the manual 'latest_date' filter logic
-raw_df = (spark.readStream
+raw_df = (spark.read
     .format("cloudFiles")
     .option("cloudFiles.format", "json")
     .option("cloudFiles.schemaLocation", schema_path)
@@ -44,16 +44,9 @@ processed_df = (raw_df
     .withColumn("ingestion_timestamp", current_timestamp())
     .repartition(1)) # it'll create only 1 file inside the output folder
 
-print("STEP 2 - About to start stream")
 # 5. Write to Output (Trigger Once / Batch Mode)
-query = (processed_df.writeStream
-    .trigger(availableNow=True)
+query = (processed_df.write
     .format("delta") 
     .option("checkpointLocation", offset_path)
     .outputMode("append")
-    .start(output_base))
-print("STEP 3 - Stream started")
-print("STEP 4 - Before processAllAvailable")
-query.processAllAvailable()
-query.stop()
-print("=== STREAM FINISHED ===")
+    .save(output_base))

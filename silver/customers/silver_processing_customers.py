@@ -13,7 +13,7 @@ spark.sql("use catalog misgauravcatalog")
 spark.sql("create schema if not exists silverdb")
 
 # 1. Read from the Bronze folder in ADLS
-bronze_df = (spark.readStream
+bronze_df = (spark.read
     .format("delta") 
     .load(input_base))
 
@@ -28,23 +28,16 @@ silver_df = (bronze_df
 )
 
 # 3. Write to Silver folder in ADLS & created delta table
-query = (silver_df.writeStream
+query = (silver_df.write
     .format("delta") 
     .option("mergeSchema", "true")
     .option("checkpointLocation", offset_path) 
     .outputMode('append') 
     .option("path", output_base) 
-    .trigger(availableNow=True) 
-    .toTable('misgauravcatalog.silverdb.silver_customer_data')
+    .saveAsTable('misgauravcatalog.silverdb.silver_customer_data')
 )
 
-print("Streaming query started. Processing available batch data...")
-
-query.awaitTermination()
-
-print("Streaming batch complete. Data safely committed to Silver layer.")
 print("Running file compaction and Z-Ordering maintenance...")
-
 # small file problems in db: Optimize, delta.autoOptimize.optimizeWrite, delta.autoOptimize.autoCompact
 # compaction/bin packing take multiple small files & merge them into 1 large files.
 # in databricks, Optimize commands used to compact delta files upto 1 GB ; if we want > 128 MB of file use this.
