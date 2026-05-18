@@ -23,7 +23,7 @@ silver_df = (bronze_df
     .withColumn("customer_id", trim(col("customer_id")).cast("integer")) 
     .withColumn("customer_name", trim(col("customer_name"))) 
     .withColumn("state", trim(col("state"))) 
-    .withColumn("_silver_processed_at", current_timestamp()) # Audit column
+    .withColumn("_silver_customer_processed_at", current_timestamp()) # Audit column
     .dropDuplicates(["customer_id"]) # Deduplicate based on primary key
 )
 
