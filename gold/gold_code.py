@@ -3,7 +3,6 @@ from pyspark.sql.functions import col, sum, count, current_timestamp, window, ex
 # 1. Path Configurations
 output_base = "abfss://gold@misgauravstorageaccount.dfs.core.windows.net/customer_sales_summary/"
 gold_checkpoint = "abfss://gold@misgauravstorageaccount.dfs.core.windows.net/_checkpoints/"
-# 1. Path for data processing offsets
 offset_path = gold_checkpoint + "offsets"
 
 print("catalog name")
@@ -11,30 +10,30 @@ spark.sql("show catalogs").show()
 spark.sql("use catalog misgauravcatalog")
 spark.sql("create schema if not exists golddb")
 
-# 2. READ as Streaming DataFrames and correctly apply watermarks
-orders_df_new = spark.readStream.table("misgauravcatalog.silverdb.silver_order_data")
-customers_df_new = spark.readStream.table("misgauravcatalog.silverdb.silver_customer_data")
-orders_df_new.printSchema()
-customers_df_new.printSchema()
+# 2. READ as Streaming DataFrames and correctly apply watermarks (DEFINED HERE)
 orders_df = spark.readStream.table("misgauravcatalog.silverdb.silver_order_data").withWatermark("_silver_order_processed_at", "30 minutes")
 customers_df = spark.readStream.table("misgauravcatalog.silverdb.silver_customer_data").withWatermark("_silver_customer_processed_at", "30 minutes")
 
+# Give explicit SQL aliases to the DataFrames so expr() and col() can read them
+orders_aliased = orders_df.alias("ords")
+customers_aliased = customers_df.alias("cust")
 
-joined_df = orders_df.join(
-    customers_df,
+joined_df = customers_aliased.join(
+    orders_aliased,
     expr("""
-        orders_df.customer_id = customers_df.customer_id AND
-        _silver_customer_processed_at >= _silver_order_processed_at - interval 30 minutes AND
-        _silver_customer_processed_at <= _silver_order_processed_at + interval 30 minutes
-    """),
-    "inner"
+        cust.customer_id = ords.customer_id AND
+        ords._silver_order_processed_at >= cust._silver_customer_processed_at AND
+        ords._silver_order_processed_at <= cust._silver_customer_processed_at + interval 2 hours
+    """), 
+    "left"
 )
+
 # 3. Transformation & Aggregation testing.
+# FIX: Removed the duplicate .withWatermark() call here
 window_agg_df = (
-    joined_df.withWatermark("_silver_order_processed_at", "30 minutes")
-    .groupBy(
+    joined_df.groupBy(
         window(col("_silver_order_processed_at"), "15 minutes"), 
-        col("customers_df.customer_id").alias("customer_id"), 
+        col("cust.customer_id").alias("customer_id"), 
         col("customer_name"), 
         col("state")
     )
@@ -66,20 +65,12 @@ query = (gold_df.writeStream
 )
 
 print("Streaming query started. Processing available batch data...")
-
 query.awaitTermination()
+print("Streaming batch complete. Data safely committed to Gold layer.")
 
-print("Streaming batch complete. Data safely committed to Silver layer.")
+# 4. Maintenance
 print("Running file compaction and Z-Ordering maintenance...")
-
-# small file problems in db: Optimize, delta.autoOptimize.optimizeWrite, delta.autoOptimize.autoCompact
-# compaction/bin packing take multiple small files & merge them into 1 large files.
-# in databricks, Optimize commands used to compact delta files upto 1 GB ; if we want > 128 MB of file use this.
-# delta.autoOptimize.optimizeWrite = true ; before writing to the disk many small files are combine them to form a larger files (128MB), created bigger files (128MB). create a files around 128 MB after clubbing ; 
-# delta.autoOptimize.autoCompact = true ; small files are already written to the disk, then compacted to form larger files (128MB), works only when we have > 50 smaill files. create a files around 128 MB after clubbing ; 
-# 4. Maintenance: Now it is 100% safe to optimize because the data is fully written
-spark.sql("OPTIMIZE misgauravcatalog.golddb.cust_summary ZORDER BY customer_id")
+spark.sql("OPTIMIZE misgauravcatalog.golddb.cust_summary ZORDER BY (customer_id)")
 
 print("Optimization and Z-Ordering Complete.")
-
 print("Gold Layer Processing Complete.")
