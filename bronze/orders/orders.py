@@ -23,7 +23,7 @@ orders_schema = StructType([
 ])
 
 # 3. Read using Auto Loader with EXPLICIT SCHEMA
-raw_df = (spark.readStream
+raw_df = (spark.read
     .format("json")
     .schema(orders_schema)
     .load(input_base))
@@ -39,5 +39,6 @@ processed_df = (raw_df
 # 5. Write to Output
 query = (processed_df.write
     .format("delta")
+    .option("mergeSchema", "true")
     .outputMode("append")
     .save(output_base))

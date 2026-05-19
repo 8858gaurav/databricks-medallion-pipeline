@@ -42,5 +42,6 @@ processed_df = (raw_df
 # 5. Write to Output (Trigger Once / Batch Mode)
 query = (processed_df.write
     .format("delta") 
+    .option("mergeSchema", "true")
     .outputMode("append")
     .save(output_base))

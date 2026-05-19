@@ -31,7 +31,7 @@ silver_df = (bronze_df
 )
 
 # 3. Write to Silver folder in ADLS & created delta table
-query = (silver_df.writeStream
+query = (silver_df.write
     .format("delta") 
     .option("mergeSchema", "true")
     .outputMode('append') 
