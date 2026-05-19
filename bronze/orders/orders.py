@@ -1,9 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-
-spark.conf.set("spark.databricks.cloudFiles.formatValidation.enabled", "false")
-
+ 
 # 1. Path Configurations
 input_base = "abfss://input-path@misgauravstorageaccount.dfs.core.windows.net/orders/"
 output_base = "abfss://bronze@misgauravstorageaccount.dfs.core.windows.net/orders/"
@@ -25,10 +23,8 @@ orders_schema = StructType([
 ])
 
 # 3. Read using Auto Loader with EXPLICIT SCHEMA
-raw_df = (spark.read
-    .format("cloudFiles")
-    .option("cloudFiles.format", "json")
-    .option("cloudFiles.schemaLocation", schema_path)
+raw_df = (spark.readStream
+    .format("json")
     .schema(orders_schema)
     .load(input_base))
 
@@ -40,10 +36,8 @@ processed_df = (raw_df
     .withColumn("processing_timestamp", current_timestamp())
     .repartition(1)) # it'll create only 1 file inside the output folder
 
-print("STEP 2 - About to start stream")
 # 5. Write to Output
 query = (processed_df.write
     .format("delta")
-    .option("checkpointLocation", offset_path)
     .outputMode("append")
     .save(output_base))

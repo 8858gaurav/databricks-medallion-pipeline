@@ -16,7 +16,7 @@ spark.sql("create schema if not exists silverdb")
 
 # 1. Read from the Bronze folder in ADLS
 bronze_df = (spark.read
-    .format("delta") 
+    .format("delta")
     .load(input_base))
 
 # 2. Transformation Logic (Cleansing)
@@ -31,10 +31,9 @@ silver_df = (bronze_df
 )
 
 # 3. Write to Silver folder in ADLS & created delta table
-query = (silver_df.write
+query = (silver_df.writeStream
     .format("delta") 
     .option("mergeSchema", "true")
-    .option("checkpointLocation", offset_path) 
     .outputMode('append') 
     .option("path", output_base) 
     .saveAsTable('misgauravcatalog.silverdb.silver_order_data')

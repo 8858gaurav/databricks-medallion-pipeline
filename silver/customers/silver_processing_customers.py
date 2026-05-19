@@ -1,7 +1,5 @@
 from pyspark.sql.functions import col, upper, trim, current_timestamp
 
-spark.conf.set("spark.databricks.cloudFiles.formatValidation.enabled", "false")
-
 # 1. Path Configurations
 input_base = "abfss://bronze@misgauravstorageaccount.dfs.core.windows.net/customers/"
 output_base = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/customers/"
@@ -16,7 +14,7 @@ spark.sql("create schema if not exists silverdb")
 
 # 1. Read from the Bronze folder in ADLS
 bronze_df = (spark.read
-    .format("delta") 
+    .format("delta")
     .load(input_base))
 
 # 2. Transformation Logic (Cleansing)
@@ -33,7 +31,6 @@ silver_df = (bronze_df
 query = (silver_df.write
     .format("delta") 
     .option("mergeSchema", "true")
-    .option("checkpointLocation", offset_path) 
     .outputMode('append') 
     .option("path", output_base) 
     .saveAsTable('misgauravcatalog.silverdb.silver_customer_data')

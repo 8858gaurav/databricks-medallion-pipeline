@@ -2,8 +2,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-spark.conf.set("spark.databricks.cloudFiles.formatValidation.enabled", "false")
-
 # 1. Path Configurations
 # Note: Use the base directory for Auto Loader (remove *.json)
 input_base = "abfss://input-path@misgauravstorageaccount.dfs.core.windows.net/customers/"
@@ -29,10 +27,8 @@ customers_schema = StructType([
 # 3. Read using Auto Loader (Incremental Batch Mode)
 # This replaces the manual 'latest_date' filter logic
 raw_df = (spark.read
-    .format("cloudFiles")
-    .option("cloudFiles.format", "json")
-    .option("cloudFiles.schemaLocation", schema_path)
-    .schema(customers_schema) # Providing schema for better performance
+    .format("json")
+    .schema(customers_schema)
     .load(input_base))
 
 # 4. Processing Logic
@@ -46,6 +42,5 @@ processed_df = (raw_df
 # 5. Write to Output (Trigger Once / Batch Mode)
 query = (processed_df.write
     .format("delta") 
-    .option("checkpointLocation", offset_path)
     .outputMode("append")
     .save(output_base))
