@@ -31,7 +31,7 @@ silver_df = (bronze_df
 query = (silver_df.write
     .format("delta") 
     .option("mergeSchema", "true")
-    .outputMode('append') 
+    .mode("append")
     .option("path", output_base) 
     .saveAsTable('misgauravcatalog.silverdb.silver_customer_data')
 )

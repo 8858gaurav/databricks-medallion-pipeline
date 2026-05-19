@@ -44,7 +44,7 @@ gold_df = window_agg_df.select(
 query = (gold_df.write
     .format("delta") 
     .option("mergeSchema", "true")
-    .outputMode('append') 
+    .mode("append")
     .option("path", output_base) 
     .saveAsTable('misgauravcatalog.golddb.cust_summary')
 )
