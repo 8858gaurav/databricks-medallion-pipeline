@@ -12,16 +12,17 @@ spark.sql("show catalogs").show()
 spark.sql("use catalog misgauravcatalog")
 spark.sql("create schema if not exists golddb")
 
-# 2. READ as Streaming DataFrames and correctly apply watermarks (DEFINED HERE)
+# 2. READ tables cleanly
 orders_df = spark.read.table("misgauravcatalog.silverdb.silver_order_data")
 customers_df = spark.read.table("misgauravcatalog.silverdb.silver_customer_data")
 
+# Using the string format for the join key combines them automatically
 joined_df = orders_df.join(customers_df, "customer_id", "left")
 
-# 3. Transformation & Aggregation testing.
+# 3. Transformation & Aggregation testing
 window_agg_df = (
     joined_df.groupBy( 
-        col("customers_df.customer_id").alias("customer_id"), 
+        col("customer_id"),
         col("customer_name"), 
         col("state")
     )
@@ -41,6 +42,7 @@ gold_df = window_agg_df.select(
     col("_gold_processed_at")
 )
 
+# Writing via batch using saveAsTable
 query = (gold_df.write
     .format("delta") 
     .option("mergeSchema", "true")
