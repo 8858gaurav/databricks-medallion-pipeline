@@ -1,5 +1,7 @@
 from pyspark.sql.functions import col, sum, count, current_timestamp, window, expr
 
+spark.conf.set("spark.databricks.cloudFiles.formatValidation.enabled", "false")
+
 # 1. Path Configurations
 output_base = "abfss://gold@misgauravstorageaccount.dfs.core.windows.net/customer_sales_summary/"
 gold_checkpoint = "abfss://gold@misgauravstorageaccount.dfs.core.windows.net/_checkpoints/"

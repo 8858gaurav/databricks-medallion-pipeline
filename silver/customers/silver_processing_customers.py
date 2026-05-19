@@ -1,5 +1,7 @@
 from pyspark.sql.functions import col, upper, trim, current_timestamp
 
+spark.conf.set("spark.databricks.cloudFiles.formatValidation.enabled", "false")
+
 # 1. Path Configurations
 input_base = "abfss://bronze@misgauravstorageaccount.dfs.core.windows.net/customers/"
 output_base = "abfss://silver@misgauravstorageaccount.dfs.core.windows.net/customers/"

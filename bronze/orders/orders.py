@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-spark = SparkSession.builder.appName("Orders_Pipeline").getOrCreate()
+spark.conf.set("spark.databricks.cloudFiles.formatValidation.enabled", "false")
 
 # 1. Path Configurations
 input_base = "abfss://input-path@misgauravstorageaccount.dfs.core.windows.net/orders/"

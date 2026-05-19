@@ -2,8 +2,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
-# Initialize Spark Session test
-spark = SparkSession.builder.appName("Customers_Pipeline").getOrCreate()
+spark.conf.set("spark.databricks.cloudFiles.formatValidation.enabled", "false")
 
 # 1. Path Configurations
 # Note: Use the base directory for Auto Loader (remove *.json)
