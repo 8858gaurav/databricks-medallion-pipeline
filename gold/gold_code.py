@@ -43,7 +43,7 @@ gold_df = window_agg_df.select(
 
 query = (gold_df.write
     .format("delta") 
-    .option("checkpointLocation", offset_path) 
+    .option("mergeSchema", "true")
     .outputMode('append') 
     .option("path", output_base) 
     .saveAsTable('misgauravcatalog.golddb.cust_summary')
