@@ -1,0 +1,52 @@
+Step 1: Connecting Databricks to GitHub (Repos)
+
+go to Github -> create Repos -> 
+to generate token -> go to Github -> settings -> developer settings -> PAT -> tokens classic
+
+go to databricks -> settings -> linked accounts -> add git credentials -> pass your token here & other stuffs
+go to databricks -> settings -> development -> git url allow list -> paste your git repo url
+
+go to databricks -> click on Workspace icon -> click on Workspace folder ->  select the Repos folder (under Workspace folder, you'll find the folder name as Repos) -> Create Git Folder -> ( give your repo link, select providers, git folder name)
+
+=======================================================================================================================================
+
+Step 2: Setting up the CI Folder Structure
+creat .github (add yml script: databricks_ci.yml under github folder) and tests folder (add untit test python script: test_transformations.py under tests folder)
+you need to create this .github folder, and test folder under your git folder name which you have created in step 1
+or you can create this folder .github/test by using Gihub UI
+
+
+e.g 
+1. test_transformations.py files looks like as below:
+# tests/test_transformations.py
+def calculate_discount(price, discount):
+    return price - discount
+
+def test_calculate_discount():
+    # This is a 'Unit Test'
+    assert calculate_discount(100, 20) == 80
+    assert calculate_discount(50, 50) == 0
+
+2. add teh contents for databricks_ci.yml files.
+
+
+now, if you push your code from databricks with the help of local branch, then merge the request on Github by creating a pull request: workflow under Github actions will run and it's name will be : Databricks Medallion CI
+Where it's running : Github server VM, this serves also run our unit test cases: test_transformations.py
+
+=======================================================================================================================================
+
+DATABRICKS_TOKEN:
+Go to your Repo Settings -> Secrets and variables -> Actions -> secrets tab -> New repository secret -> DATABRICKS_TOKEN -> paste your db personal access token
+DATABRICKS_HOST:
+Go to your Repo Settings -> Secrets and variables -> Actions -> click on Variable tab ->  New Repository Variable -> paste your db worskpace link
+
+
+=======================================================================================================================================
+
+DBAs conecepts:
+GitHub took your latest Python code files (bronze, silver, gold) and securely uploaded them into your personal Databricks workspace directory under xxxx@gmail.com
+go to workspace -> Users -> gauravmishra7080@gmail.com -> .bundle -> databricks-medallion-pipeline -> prod -> files  -> (.github | bronze | silver | gold | tests | databricks.yml)
+
+git token : xxxxxxx
+databricks token : xxxxxxx
+
