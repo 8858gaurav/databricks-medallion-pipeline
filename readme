@@ -34,6 +34,8 @@ now, if you push your code from databricks with the help of local branch, then m
 Where it's running : Github server VM, this serves also run our unit test cases: test_transformations.py
 
 =======================================================================================================================================
+how to Get Databricks PAT:
+DB UI -> Settings -> Developer -> Acess token -> manage -> generate new token
 
 DATABRICKS_TOKEN:
 Go to your Repo Settings -> Secrets and variables -> Actions -> secrets tab -> New repository secret -> DATABRICKS_TOKEN -> paste your db personal access token
