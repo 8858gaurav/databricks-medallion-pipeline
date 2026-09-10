@@ -1,1 +1,2 @@
-here, we are not creating bronzr table via delta format table techniques. we are just writing an output under broze layer (bronze container)
+here, we are just reading the file from different containers : customers/orders as a raw data.
+we are not creating bronzr table via delta format table techniques. we are just writing an output under broze layer (bronze container)
