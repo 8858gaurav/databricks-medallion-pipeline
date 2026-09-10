@@ -1,0 +1,1 @@
+here, we are reading the file directly as a bronze layer, we are not creating bronzr table via delta format table techniques. 
